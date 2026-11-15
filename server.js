@@ -49,7 +49,10 @@ const startServer = async () => {
     });
 
     // Start Express server
-    app.listen(3000, "0.0.0.0", () => {
+    const PORT = process.env.PORT || 3000;
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`BookNook Cafe server running on port ${PORT}`);
       console.log("BookNook Cafe server started successfully");
       console.log("Server running at http://localhost:3000");
     });

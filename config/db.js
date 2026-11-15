@@ -2,6 +2,7 @@
 const sqlite = require("sqlite");
 const sqlite3 = require("sqlite3");
 const path = require("path");
+const fs = require("fs");
 
 // Database file path
 const dbPath = path.join(
@@ -9,8 +10,13 @@ const dbPath = path.join(
   "../database/booknook.db"
 );
 
-// Initialize database
+// Create database folder if it does not exist
+fs.mkdirSync(path.dirname(dbPath), {
+  recursive: true
+});
+
 const initializeDB = async () => {
+  // Open SQLite database
   const db = await sqlite.open({
     filename: dbPath,
     driver: sqlite3.Database
@@ -67,5 +73,4 @@ const initializeDB = async () => {
   return db;
 };
 
-// Export database initialization function
 module.exports = initializeDB;
