@@ -1,0 +1,262 @@
+{
+  "info": {
+    "name": "BookNook Cafe API",
+    "description": "Postman collection for testing the BookNook Cafe Board Game Booking Management System.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "guestId",
+      "value": "2"
+    },
+    {
+      "key": "gameId",
+      "value": "1"
+    },
+    {
+      "key": "bookingId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Server",
+      "item": [
+        {
+          "name": "Check server",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Server responds with 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Guests",
+      "item": [
+        {
+          "name": "Get all guests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/guests"
+          }
+        },
+        {
+          "name": "Get guest by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/guests/{{guestId}}"
+          }
+        },
+        {
+          "name": "Add guest",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guest_name\": \"Asha\",\n  \"phone\": \"9876543210\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/guests"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Guest created or duplicate phone handled', function () { pm.expect([201, 409]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('guestId', pm.response.json().guest_id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete guest (use only if no booking history)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/guests/{{guestId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Games",
+      "item": [
+        {
+          "name": "Get all games",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/games"
+          }
+        },
+        {
+          "name": "Get game by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/games/{{gameId}}"
+          }
+        },
+        {
+          "name": "Search games by player count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/games?players=2"
+          }
+        },
+        {
+          "name": "Add game",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"game_name\": \"Carrom\",\n  \"min_players\": 2,\n  \"max_players\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/games"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Game created', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('gameId', pm.response.json().game_id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update game",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"game_name\": \"Carrom\",\n  \"min_players\": 2,\n  \"max_players\": 6\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/games/{{gameId}}"
+          }
+        },
+        {
+          "name": "Delete game (use only if no booking history)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/games/{{gameId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Get bookings with guest and game names (JOIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/bookings"
+          }
+        },
+        {
+          "name": "Book a game",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"guest_id\": 2, \"game_id\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/bookings"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Booking created or conflict correctly returned', function () { pm.expect([201, 409]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('bookingId', pm.response.json().booking_id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Return a booked game",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/return"
+          }
+        }
+      ]
+    }
+  ]
+}
